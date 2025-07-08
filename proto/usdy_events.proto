@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package usdy.types.v1;
+
+option go_package = "github.com/PaulieB14/usdy-solana-substreams/pb/usdy/types/v1;pbusdy";
+
+// Transaction data structure
+message UsdyTransactions {
+  repeated UsdyTransaction transactions = 1;
+}
+
+message UsdyTransaction {
+  string signature = 1;
+  string block_hash = 2;
+  uint64 block_number = 3;
+  int64 block_timestamp = 4;
+  repeated UsdyInstruction instructions = 5;
+  bool success = 6;
+  string fee_payer = 7;
+  uint64 fee = 8;
+  repeated string accounts = 9;
+}
+
+message UsdyInstruction {
+  string program_id = 1;
+  repeated string accounts = 2;
+  string data = 3;
+  uint32 instruction_index = 4;
+  string instruction_type = 5;
+}
+
+// Event data structures
+message UsdyEvents {
+  repeated UsdyEvent events = 1;
+}
+
+message UsdyEvent {
+  string transaction_signature = 1;
+  string block_hash = 2;
+  uint64 block_number = 3;
+  int64 block_timestamp = 4;
+  uint32 instruction_index = 5;
+  string event_type = 6;
+  oneof event_data {
+    UsdyTransfer transfer = 7;
+    UsdyMint mint = 8;
+    UsdyBurn burn = 9;
+    UsdyApproval approval = 10;
+    UsdyAccountCreation account_creation = 11;
+  }
+}
+
+// Transfer event
+message UsdyTransfer {
+  string from = 1;
+  string to = 2;
+  string amount = 3;
+  string authority = 4;
+}
+
+// Mint event
+message UsdyMint {
+  string to = 1;
+  string amount = 2;
+  string mint_authority = 3;
+}
+
+// Burn event
+message UsdyBurn {
+  string from = 1;
+  string amount = 2;
+  string burn_authority = 3;
+}
+
+// Approval event
+message UsdyApproval {
+  string owner = 1;
+  string spender = 2;
+  string amount = 3;
+}
+
+// Account creation event
+message UsdyAccountCreation {
+  string account = 1;
+  string owner = 2;
+  string mint = 3;
+}
+
+// Holder balance tracking
+message UsdyHolderBalance {
+  string account = 1;
+  string balance = 2;
+  int64 last_updated = 3;
+}
+
+// Holder deltas for tracking balance changes
+message UsdyHolderDeltas {
+  repeated UsdyHolderDelta deltas = 1;
+}
+
+message UsdyHolderDelta {
+  string account = 1;
+  string old_balance = 2;
+  string new_balance = 3;
+  string delta = 4;
+  int64 timestamp = 5;
+  string transaction_signature = 6;
+}

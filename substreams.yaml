@@ -1,0 +1,84 @@
+specVersion: v0.1.0
+package:
+  name: 'usdy_solana_tracker'
+  version: v0.1.0
+  url: https://github.com/PaulieB14/usdy-solana-substreams
+  doc: |
+    Substreams for tracking USDY token transactions on Solana.
+    USDY Contract: A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6
+    
+    This substreams tracks:
+    - Token transfers
+    - Mint/burn events
+    - Account balance changes
+    - Transaction metadata
+
+imports:
+  solana: https://github.com/streamingfast/substreams-solana-common/releases/download/v0.2.0/substreams-solana-common-v0.2.0.spkg
+  database_change: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v1.3.1/substreams-database-change-v1.3.1.spkg
+
+protobuf:
+  files:
+    - usdy_events.proto
+  importPaths:
+    - ./proto
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: target/wasm32-unknown-unknown/release/usdy_solana_tracker.wasm
+
+modules:
+  - name: map_usdy_transactions
+    kind: map
+    initialBlock: 260000000
+    inputs:
+      - source: sf.solana.type.v1.Block
+    output:
+      type: proto:usdy.types.v1.UsdyTransactions
+    params:
+      token_contract: "A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6"
+      token_decimals: "6"
+      token_symbol: "USDY"
+  
+  - name: map_usdy_events
+    kind: map
+    initialBlock: 260000000
+    inputs:
+      - map: map_usdy_transactions
+    output:
+      type: proto:usdy.types.v1.UsdyEvents
+
+  - name: store_usdy_holders
+    kind: store
+    initialBlock: 260000000
+    updatePolicy: set
+    valueType: proto:usdy.types.v1.UsdyHolderBalance
+    inputs:
+      - map: map_usdy_events
+
+  - name: map_usdy_holder_deltas
+    kind: map
+    initialBlock: 260000000
+    inputs:
+      - map: map_usdy_events
+      - store: store_usdy_holders
+    output:
+      type: proto:usdy.types.v1.UsdyHolderDeltas
+
+  - name: db_out
+    kind: map
+    initialBlock: 260000000
+    inputs:
+      - map: map_usdy_events
+      - map: map_usdy_holder_deltas
+    output:
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+
+network: solana-mainnet-beta
+
+params:
+  map_usdy_transactions:
+    token_contract: "A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6"
+    token_decimals: "6"
+    token_symbol: "USDY"
