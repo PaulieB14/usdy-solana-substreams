@@ -1,0 +1,63 @@
+theme: minima
+title: USDY Solana Substreams
+description: Real-time USDY token tracking on Solana blockchain
+url: https://paulieb14.github.io/usdy-solana-substreams
+baseurl: /usdy-solana-substreams
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Site settings
+author: PaulieB14
+email: your.email@example.com
+twitter_username: PaulBarba12
+github_username: PaulieB14
+
+# Navigation
+nav_links:
+  - name: Home
+    url: /
+  - name: Dashboard
+    url: /docs/dashboard.html
+  - name: Quick Start
+    url: /QUICKSTART.md
+  - name: API Documentation
+    url: /docs/API.md
+  - name: GitHub
+    url: https://github.com/PaulieB14/usdy-solana-substreams
+
+# SEO
+logo: /assets/images/logo.png
+social:
+  name: USDY Solana Substreams
+  links:
+    - https://github.com/PaulieB14/usdy-solana-substreams
+    - https://twitter.com/PaulBarba12
+
+# Footer
+footer_links:
+  - name: GitHub
+    url: https://github.com/PaulieB14/usdy-solana-substreams
+  - name: Issues
+    url: https://github.com/PaulieB14/usdy-solana-substreams/issues
+  - name: Discussions
+    url: https://github.com/PaulieB14/usdy-solana-substreams/discussions
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - target/
+  - Cargo.toml
+  - Cargo.lock
+  - "*.spkg"
