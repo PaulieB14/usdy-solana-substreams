@@ -83,12 +83,11 @@ clean:
 
 # Running substreams
 run-dev:
-	@echo "🚀 Running in development mode..."
-	$(SUBSTREAMS) gui substreams.yaml map_usdy_events \
-		-e $(ENDPOINT) \
-		--start-block $(START_BLOCK) \
-		--stop-block $(STOP_BLOCK) \
-		--debug
+	set -a; [ -f local.env ] && source local.env; set +a; \
+	substreams gui substreams.yaml map_usdy_events \
+		-e mainnet.sol.streamingfast.io:443 \
+		--start-block 290789141 \
+		--stop-block +1000
 
 run-prod:
 	@echo "🚀 Running in production mode..."
@@ -96,12 +95,35 @@ run-prod:
 		-e $(ENDPOINT) \
 		--start-block $(START_BLOCK)
 
+stream-parquet:
+	@echo "🚀 Starting clean USDY Parquet streaming..."
+	python3 stream_usdy_parquet.py
+
+stream-parquet-resume:
+	@echo "🔄 Resuming USDY Parquet streaming..."
+	python3 stream_usdy_parquet.py --resume
+
+check-progress:
+	@echo "📊 Checking USDY streaming progress..."
+	python3 check_progress.py
+
+monitor-history:
+	@echo "🌍 Monitoring complete USDY history collection..."
+	python3 monitor_full_history.py
+
 package: build
 	@echo "📦 Packaging substreams..."
 	$(SUBSTREAMS) pack substreams.yaml
 	@echo "✅ Package created!"
 
+publish: package
+	@echo "🚀 Publishing USDY Solana Substreams to registry..."
+	@echo "📋 Package: usdy-solana-tracker-v0.1.0.spkg"
+	@echo "🌐 Visit https://substreams.dev/me to get your token if needed"
+	$(SUBSTREAMS) publish usdy-solana-tracker-v0.1.0.spkg
+	@echo "✅ Package published!"
+
 docs:
-	@echo "📚 Generating documentation..."
+	@echo "� Generating documentation..."
 	$(CARGO) doc --no-deps --document-private-items
 	@echo "✅ Documentation generated!"
